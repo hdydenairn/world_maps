@@ -55,7 +55,7 @@ eu_cars_2020%>%
   labs(x = "",
        title="Passenger Cars per Person ",
        subtitle ="EU27+ in 2020",
-       caption="Instagram & Twitter: @hdydenairn | Source: https://ec.europa.eu/eurostat/databrowser/view/road_eqs_carhab/")+
+       caption="Source: https://ec.europa.eu/eurostat/databrowser/view/road_eqs_carhab/")+
   theme(
     legend.position = c(0.9, 0.5),
     plot.caption = element_text(hjust = 0.5, size = 8, vjust = 20),
