@@ -12,9 +12,9 @@ library(eurostat)
 library(sf)
 
 
-# find, attach & clean dataset
+## find, attach & clean dataset ---- 
 
-# get shapefile (nuts2)
+# get shapefile (nuts2 & states)
 shape <- get_eurostat_geospatial(
   output_class = "sf",
   resolution = "60",
@@ -25,11 +25,23 @@ shape <- get_eurostat_geospatial(
   cache_dir = NULL,
   crs = "4326",
   make_valid = FALSE
-)
+) 
+states <- get_eurostat_geospatial(
+  output_class = "sf",
+  resolution = "60",
+  nuts_level = "0",
+  year = "2016",
+  cache = TRUE,
+  update_cache = FALSE,
+  cache_dir = NULL,
+  crs = "4326",
+  make_valid = FALSE
+) %>% fortify()
+
 
 # search for datasets on NUTS 2 level in their title
 all_eurostat <- eurostat::get_eurostat_toc()
-nuts_2_level <- subset(toc, grepl('NUTS 2', title))
+nuts_2_level <- subset(all_eurostat, grepl('NUTS 2', title))
 
 # get NUTS2-level data on employment in STEM
 htec_emp_reg2 <- eurostat::get_eurostat("htec_emp_reg2",
@@ -47,9 +59,9 @@ stem1 <- st_as_sf(right_join(stem, shape, by="geo")) %>%
   dplyr::select(geo, values, geometry) %>%
   na.omit()
 
-# create choropleth
+## create choropleth ----
 
-stem1%>%
+eu_stem_2020 <- stem1%>%
   ggplot(aes(fill = values))+
   geom_sf(color = "black", size = 0.1)+
   scale_fill_distiller(palette = "YlOrRd", trans = "reverse", 
@@ -65,8 +77,7 @@ stem1%>%
     byrow = T,
     reverse = F,
     label.position = "bottom"
-  )
-  )+
+  ))+
   theme_minimal()+
   coord_sf(xlim=c(-10.6600,39), ylim=c(32.5000,71.0500))+
   labs(x = "",
@@ -86,9 +97,9 @@ stem1%>%
         legend.text = element_text(size=10, color="grey20"),
         legend.title = element_text(size=11, color="grey20"),
         strip.text = element_text(size=12),
-        plot.margin = unit(c(t=-2, r=-2, b=-2, l=-2),"lines"), #added these narrower margins to enlarge map
         axis.title.y = element_blank(),
         axis.ticks = element_blank(),
         axis.text.x = element_blank(),
         axis.text.y = element_blank())
+
 ggsave("eu_stem_2020.png", height = 9, width = 12)
